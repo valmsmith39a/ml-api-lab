@@ -13,6 +13,7 @@ urllib3 = "^1.26.12"
 fastapi = "^0.88.0"
 uvicorn = "^0.20.0"
 openai = "0.27.4"
+ibm-watson = "7.0.0"
 
 [tool.poetry.dev-dependencies]
 debugpy = "^1.6.2"
