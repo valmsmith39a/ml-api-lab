@@ -16,7 +16,30 @@ async def root():
 	return { "message": "Hello Metaverse" }
 
 @app.get("/sentiment/emotion-detection")
-async def get_sentiment_emotion_detection(text: str):
+async def get_sentiment_emotion_detection(request: UserConversationRequest):
+	emotion_detection_scores = call_ibm_nlu_emotion_detection(request)
+	response = call_chat_gpt(request, emotion_detection_scores)	
+	return { "message": "Hello from sentiment emotion-detection" }
+	
+@app.get("/twitter/tweets/summary")
+async def get_tweets_summary(request: UserConversationRequest):
+	return { "message": f"User text input is: {text}"}
+	
+def call_chatgpt(request):
+	model = request.model
+	messages = request.messages
+	response = openai.ChatCompletion.create(
+		model=model,
+		messages=messages
+	)
+	if 'choices' in response:
+		assistant_response = response['choices'][0]['message']['content']
+		print(f"Assistant: {assistant_response}")
+	else: 
+		print("Error: API response is not as expected")
+	return response 
+
+def call_ibm_nlu_emotion_detection(text):
 	endpoint = ibm_nlu_emotion_detection_url 
 	authenticator = IAMAuthenticator(ibm_nlu_emotion_detection_api_key)
 	natural_language_understanding = NaturalLanguageUnderstandingV1(version='2021-03-25', authenticator=authenticator)
@@ -27,32 +50,6 @@ async def get_sentiment_emotion_detection(text: str):
 	
 	response = natural_language_understanding.analyze(text=text, features=emotion_features).get_result()
 	print(response)
+	
 	emotions = response['emotion']['document']['emotion']
 	print(emotions)
-
-	# messages = [
-	# 	{"role": "system", "content": "You are a helpful assistant."},
-	# 	{"role": "user", "content": "Who won the world series in 2020?"},
-	# 	{"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
-	# 	{"role": "user", "content": "Where was it played?"}
-	# ]
-	# response = call_chatgpt(messages)
-	# if 'choices' in response:
-	# 	assistant_response = response['choices'][0]['message']['content']
-	# 	print(f"Assistant: {assistant_response}")
-	# else: 
-	# 	print("Error: API response is not as expected")
-
-	return { "message": "Hello from sentiment emotion-detection" }
-	
-@app.get("/twitter/tweets/summary")
-async def get_tweets_summary(text: str):
-	return { "message": f"User text input is: {text}"}
-	
-def call_chatgpt(messages):
-	response = openai.ChatCompletion.create(
-		model="gpt-3.5-turbo",
-		messages=messages
-	)
-	return response 
-	
