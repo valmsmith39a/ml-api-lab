@@ -45,7 +45,7 @@ def call_ibm_nlu_emotion_detection(text):
 	natural_language_understanding = NaturalLanguageUnderstandingV1(version='2021-03-25', authenticator=authenticator)
 	natural_language_understanding.set_service_url(endpoint)
 	
-	text = "I am really happy today!"
+	text = "I am so happy today!"
 	emotion_features = Features(emotion=EmotionOptions())
 	
 	response = natural_language_understanding.analyze(text=text, features=emotion_features).get_result()
